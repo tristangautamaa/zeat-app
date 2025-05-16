@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'welcome_page.dart';
+import 'sign_in_page.dart';
+import 'sign_up_page.dart';
+import 'home_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,7 +13,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: LandingPage());
+    return MaterialApp(
+      initialRoute: '/landing',
+      routes: {
+        '/landing': (context) => LandingPage(),
+        '/welcome': (context) => WelcomePage(),
+        '/sign-in': (context) => SignInPage(),
+        '/sign-up': (context) => SignUpPage(),
+        '/home': (context) => HomePage(),
+      },
+    );
   }
 }
 
@@ -19,23 +32,21 @@ class LandingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Solid black background
+      backgroundColor: Colors.black,
       body: Column(
         children: [
-          // Smaller image at the top
           Container(
             width: double.infinity,
-            height: 500, // Kept your adjusted height
+            height: 500,
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/bread-landing.png'),
-                fit: BoxFit.contain, // Ensures image fits without stretching
+                fit: BoxFit.contain,
               ),
             ),
           ),
-          // Text below the image with limited expansion
           Expanded(
-            flex: 2, // Reduced flex to give more space to the button area
+            flex: 2,
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -61,19 +72,18 @@ class LandingPage extends StatelessWidget {
               ),
             ),
           ),
-          // Button moved higher with adjusted spacing
           Padding(
             padding: const EdgeInsets.only(
               top: 20.0,
               bottom: 50.0,
               left: 16.0,
               right: 16.0,
-            ), // Increased top padding, reduced bottom
+            ),
             child: SizedBox(
-              width: double.infinity, // Full screen width
+              width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Add navigation or action here
+                  Navigator.pushNamed(context, '/welcome');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.brown,
