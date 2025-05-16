@@ -3,13 +3,14 @@ import 'welcome_page.dart';
 import 'sign_in_page.dart';
 import 'sign_up_page.dart';
 import 'home_page.dart';
+import 'menu_item_detail_page.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +22,11 @@ class MyApp extends StatelessWidget {
         '/sign-in': (context) => SignInPage(),
         '/sign-up': (context) => SignUpPage(),
         '/home': (context) => HomePage(),
+        '/menu-item-detail':
+            (context) => MenuItemDetailPage(
+              menuItemId:
+                  ModalRoute.of(context)?.settings.arguments as String? ?? '',
+            ),
       },
     );
   }
