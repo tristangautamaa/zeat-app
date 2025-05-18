@@ -30,7 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  provider: ^6.1.1
+  intl: ^0.18.1
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
@@ -56,7 +57,20 @@ flutter:
     - assets/home-discount.png
     - assets/croissant.jpg
     - assets/pain-au-chocolat.jpg
-
+    - assets/chicken-puff.jpg
+    - assets/apple-turnover.jpg
+    - assets/apple-danish.jpg
+    - assets/custard-danish.jpg
+    - assets/blueberry-danish.jpg
+    - assets/strawberry-danish.jpg
+    - assets/fruit-tart.jpg
+    - assets/egg-tart.jpg
+    - assets/apple-tart.jpg
+    - assets/chocolate-tart.jpg
+    - assets/vandbakkelseskrans.webp
+    - assets/chocolate-choux.jpg
+    - assets/eclair.jpg
+    - assets/vanilla-cream-choux.jpg
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

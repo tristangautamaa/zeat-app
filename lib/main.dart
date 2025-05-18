@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'welcome_page.dart';
 import 'sign_in_page.dart';
 import 'sign_up_page.dart';
 import 'home_page.dart';
 import 'menu_item_detail_page.dart';
+import 'shopping_cart_page.dart';
+import 'cart_provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(create: (context) => CartProvider(), child: MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -15,6 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       initialRoute: '/landing',
       routes: {
         '/landing': (context) => LandingPage(),
@@ -22,11 +28,12 @@ class MyApp extends StatelessWidget {
         '/sign-in': (context) => SignInPage(),
         '/sign-up': (context) => SignUpPage(),
         '/home': (context) => HomePage(),
-        '/menu-item-detail':
-            (context) => MenuItemDetailPage(
-              menuItemId:
-                  ModalRoute.of(context)?.settings.arguments as String? ?? '',
-            ),
+        '/menu-item-detail': (context) {
+          final String? menuItemId =
+              ModalRoute.of(context)?.settings.arguments as String?;
+          return MenuItemDetailPage(menuItemId: menuItemId ?? '');
+        },
+        '/shopping-cart': (context) => ShoppingCartPage(),
       },
     );
   }
