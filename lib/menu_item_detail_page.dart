@@ -16,7 +16,6 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
   String selectedSize = 'Medium';
   bool isLiked = false;
   bool isDescriptionExpanded = false;
-  final NumberFormat _numberFormat = NumberFormat('#,###', 'id_ID');
 
   final Map<String, Map<String, dynamic>> _menuItems = {
     '1': {
@@ -192,7 +191,6 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                 IconButton(
                   icon: Icon(Icons.arrow_back, size: 30, color: Colors.black),
                   onPressed: () {
-                    print('Navigating back to HomePage');
                     Navigator.pop(context);
                   },
                 ),
@@ -320,7 +318,7 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFFB3672B), // Cider color
+                                    color: Color(0xFFB3672B),
                                   ),
                                 ),
                               ),
@@ -370,11 +368,11 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                       style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                     Text(
-                      'Rp ${_numberFormat.format(_currentItem!['price'])}',
+                      'Rp ${NumberFormat('#,###', 'id_ID').format(_currentItem!['price'])}',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFB3672B), // Cider color
+                        color: Color(0xFFB3672B),
                       ),
                     ),
                   ],
@@ -394,7 +392,7 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                     Navigator.pushNamed(context, '/shopping-cart');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFB3672B), // Cider color
+                    backgroundColor: Color(0xFFB3672B),
                     side: BorderSide(color: Color(0xFFB3672B)),
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   ),

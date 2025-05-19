@@ -12,7 +12,6 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   String? _selectedCategory = 'All Pastry';
   final TextEditingController _searchController = TextEditingController();
-  final NumberFormat _numberFormat = NumberFormat('#,###', 'id_ID');
   final List<Map<String, dynamic>> _menuItems = [
     // Puff Pastry
     {
@@ -350,7 +349,6 @@ class MenuItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final NumberFormat numberFormat = NumberFormat('#,###', 'id_ID');
     // Adjust font size based on name length
     double nameFontSize = name.length > 12 ? 14.0 : 18.0;
 
@@ -387,8 +385,8 @@ class MenuItemCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis, // Add ellipsis for overflow
-              maxLines: 1, // Limit to one line
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
             Text(
               category,
@@ -401,7 +399,7 @@ class MenuItemCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Rp ${numberFormat.format(price)}',
+                  'Rp ${NumberFormat('#,###', 'id_ID').format(price)}',
                   style: TextStyle(fontSize: 16, color: Colors.black),
                 ),
                 SizedBox(width: 10),
