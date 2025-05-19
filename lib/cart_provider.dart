@@ -56,4 +56,12 @@ class CartProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void removeItem(String id) {
+    final itemIndex = _items.indexWhere((item) => item.id == id);
+    if (itemIndex >= 0) {
+      _items.removeAt(itemIndex);
+      notifyListeners();
+    }
+  }
 }

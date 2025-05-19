@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
           return MenuItemDetailPage(menuItemId: menuItemId ?? '');
         },
         '/shopping-cart': (context) => ShoppingCartPage(),
+        '/order-tracking': (context) => OrderTrackingPage(),
       },
     );
   }
@@ -113,6 +114,20 @@ class LandingPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class OrderTrackingPage extends StatelessWidget {
+  const OrderTrackingPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Order Tracking')),
+      body: Center(
+        child: Text('Order placed! Tracking details will appear here.'),
       ),
     );
   }
