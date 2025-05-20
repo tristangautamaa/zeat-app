@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'cart_provider.dart';
 import 'order_tracking_delivery_page.dart';
 import 'order_tracking_pickup_page.dart';
@@ -9,20 +10,33 @@ class ShoppingCartPage extends StatefulWidget {
   const ShoppingCartPage({super.key});
 
   @override
-  _ShoppingCartPageState createState() => _ShoppingCartPageState();
+  ShoppingCartPageState createState() => ShoppingCartPageState();
 }
 
-class _ShoppingCartPageState extends State<ShoppingCartPage> {
+class ShoppingCartPageState extends State<ShoppingCartPage> {
   String _deliveryMethod = 'Deliver';
   String _deliveryAddress = 'Jl. Pattimura Kpg. Sutoyo No. 620, Bandar Lampung';
   final String _storeLocation = 'Bakery Delight, Jl. Merdeka No. 123, Jakarta';
   String _paymentMethod = 'Cash';
   bool _discountApplied = false;
+  GoogleMapController? mapController;
+  final LatLng _storePosition = const LatLng(
+    -6.1745,
+    106.8227,
+  ); // Jakarta coordinates
+  final Set<Marker> _markers = {};
 
   @override
   void initState() {
     super.initState();
     _discountApplied = false; // Reset discount on page reopen
+    _markers.add(
+      Marker(
+        markerId: const MarkerId('store_location'),
+        position: _storePosition,
+        infoWindow: const InfoWindow(title: 'Bakery Delight'),
+      ),
+    );
   }
 
   void _editAddress() {
@@ -94,6 +108,12 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   @override
+  void dispose() {
+    mapController?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
     final bool isCartEmpty = cart.items.isEmpty;
@@ -107,6 +127,21 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
     final double discountAmount =
         _discountApplied && !isCartEmpty ? 4000 : 0; // Discount is 4000
     final double total = cartTotal + deliveryFee - discountAmount;
+
+    // Initial camera position for Jakarta
+    final initialCameraPosition = CameraPosition(
+      target: _storePosition,
+      zoom: 14.0,
+    );
+
+    void _onMapCreated(GoogleMapController controller) {
+      mapController = controller;
+      // Force camera update to ensure map renders
+      mapController?.animateCamera(
+        CameraUpdate.newLatLngZoom(_storePosition, 14.0),
+      );
+      setState(() {});
+    }
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -250,44 +285,15 @@ class _ShoppingCartPageState extends State<ShoppingCartPage> {
                 const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Map interaction: Zoom/Pan at $_storeLocation',
-                          ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      height: 100,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.grey),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          'assets/jakarta_map.png',
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: 100,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Center(
-                              child: Text(
-                                'Jakarta Map\n(Failed to load image)',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                  child: SizedBox(
+                    height: 100,
+                    width: double.infinity,
+                    child: GoogleMap(
+                      onMapCreated: _onMapCreated,
+                      initialCameraPosition: initialCameraPosition,
+                      mapType: MapType.normal,
+                      zoomControlsEnabled: false,
+                      markers: _markers,
                     ),
                   ),
                 ),
