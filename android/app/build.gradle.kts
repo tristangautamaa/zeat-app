@@ -28,7 +28,12 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Inject the API key into the manifest
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = project.findProperty("googleMapsApiKey")?.toString() ?: ""
     }
+
+    ndkVersion = "27.0.12077973"
 
     buildTypes {
         release {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart'; // Add this package
 import 'cart_provider.dart';
 import 'order_tracking_delivery_page.dart';
 import 'order_tracking_pickup_page.dart';
@@ -25,6 +26,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     106.8227,
   ); // Jakarta coordinates
   final Set<Marker> _markers = {};
+  bool _mapReady = false;
 
   @override
   void initState() {
@@ -37,6 +39,17 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
         infoWindow: const InfoWindow(title: 'Bakery Delight'),
       ),
     );
+    _requestLocationPermission();
+  }
+
+  // Request location permission
+  Future<void> _requestLocationPermission() async {
+    var status = await Permission.location.request();
+    if (status.isGranted) {
+      setState(() {
+        // Permission granted, we can update UI if needed
+      });
+    }
   }
 
   void _editAddress() {
@@ -137,10 +150,14 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     void _onMapCreated(GoogleMapController controller) {
       mapController = controller;
       // Force camera update to ensure map renders
-      mapController?.animateCamera(
-        CameraUpdate.newLatLngZoom(_storePosition, 14.0),
-      );
-      setState(() {});
+      Future.delayed(const Duration(milliseconds: 100), () {
+        controller.animateCamera(
+          CameraUpdate.newLatLngZoom(_storePosition, 14.0),
+        );
+        setState(() {
+          _mapReady = true;
+        });
+      });
     }
 
     return Scaffold(
@@ -285,15 +302,28 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                 const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: SizedBox(
+                  child: Container(
                     height: 100,
                     width: double.infinity,
-                    child: GoogleMap(
-                      onMapCreated: _onMapCreated,
-                      initialCameraPosition: initialCameraPosition,
-                      mapType: MapType.normal,
-                      zoomControlsEnabled: false,
-                      markers: _markers,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: GoogleMap(
+                        onMapCreated: _onMapCreated,
+                        initialCameraPosition: initialCameraPosition,
+                        mapType: MapType.normal,
+                        zoomControlsEnabled: false,
+                        zoomGesturesEnabled: false,
+                        rotateGesturesEnabled: false,
+                        scrollGesturesEnabled: false,
+                        tiltGesturesEnabled: false,
+                        myLocationEnabled: false,
+                        myLocationButtonEnabled: false,
+                        markers: _markers,
+                      ),
                     ),
                   ),
                 ),
@@ -324,7 +354,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                       children: [
                         Text(
                           _discountApplied
-                              ? '1 Discount is Applies'
+                              ? '1 Discount is Applied'
                               : 'No discount applied',
                           style: const TextStyle(fontSize: 14),
                         ),
