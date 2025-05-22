@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'home_page.dart';
+import 'thank_you_page.dart';
 
 class OrderTrackingPickupPage extends StatefulWidget {
   const OrderTrackingPickupPage({
@@ -75,11 +76,13 @@ class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
             child: IconButton(
               icon: const Icon(Icons.home, size: 30, color: Colors.black),
               onPressed: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HomePage()),
-                  (route) => false,
-                );
+                if (mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                    (route) => false,
+                  );
+                }
               },
             ),
           ),
@@ -90,9 +93,7 @@ class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
             right: 0,
             child: Container(
               padding: const EdgeInsets.all(16.0),
-              color: Colors.white.withAlpha(
-                229,
-              ), // Replaced withOpacity with withAlpha
+              color: Colors.white.withAlpha(229),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -139,7 +140,17 @@ class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/order-finished');
+                        if (mounted) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => const ThankYouPage(
+                                    title: 'Order Picked Up',
+                                  ),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange[700],
@@ -149,8 +160,8 @@ class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
                         ),
                       ),
                       child: const Text(
-                        'Order picked up',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                        'Order Picked Up',
+                        style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
                     ),
                   ),
