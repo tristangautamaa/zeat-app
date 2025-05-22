@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:permission_handler/permission_handler.dart'; // Add this package
+import 'package:permission_handler/permission_handler.dart';
 import 'cart_provider.dart';
 import 'order_tracking_delivery_page.dart';
 import 'order_tracking_pickup_page.dart';
@@ -21,47 +21,41 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   String _paymentMethod = 'Cash';
   bool _discountApplied = false;
   GoogleMapController? mapController;
-  final LatLng _storePosition = const LatLng(
-    -6.1745,
-    106.8227,
-  ); // Jakarta coordinates
+  final LatLng _storePosition = const LatLng(-6.1745, 106.8227);
   final Set<Marker> _markers = {};
-  bool _mapReady = false;
 
   @override
   void initState() {
     super.initState();
-    _discountApplied = false; // Reset discount on page reopen
+    _discountApplied = false;
     _markers.add(
-      Marker(
-        markerId: const MarkerId('store_location'),
-        position: _storePosition,
-        infoWindow: const InfoWindow(title: 'Bakery Delight'),
+      const Marker(
+        markerId: MarkerId('store_location'),
+        position: LatLng(-6.1745, 106.8227),
+        infoWindow: InfoWindow(title: 'Bakery Delight'),
       ),
     );
     _requestLocationPermission();
   }
 
-  // Request location permission
   Future<void> _requestLocationPermission() async {
-    var status = await Permission.location.request();
-    if (status.isGranted) {
-      setState(() {
-        // Permission granted, we can update UI if needed
-      });
+    final status = await Permission.location.request();
+    if (status.isGranted && mounted) {
+      setState(() {});
     }
   }
 
   void _editAddress() {
+    final controller = TextEditingController(text: _deliveryAddress);
+    String newAddress = _deliveryAddress;
     showDialog(
       context: context,
       builder: (context) {
-        String newAddress = _deliveryAddress;
         return AlertDialog(
           title: const Text('Edit Address'),
           content: TextField(
+            controller: controller,
             onChanged: (value) => newAddress = value,
-            controller: TextEditingController(text: _deliveryAddress),
             decoration: const InputDecoration(hintText: 'Enter new address'),
           ),
           actions: [
@@ -77,7 +71,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
           ],
         );
       },
-    );
+    ).then((_) => controller.dispose());
   }
 
   void _applyDiscount(String code) {
@@ -89,13 +83,15 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   void _showVoucherDialog() {
+    final controller = TextEditingController();
+    String voucherCode = '';
     showDialog(
       context: context,
       builder: (context) {
-        String voucherCode = '';
         return AlertDialog(
           title: const Text('Enter Voucher Code'),
           content: TextField(
+            controller: controller,
             onChanged: (value) => voucherCode = value,
             decoration: const InputDecoration(hintText: 'Enter code'),
           ),
@@ -110,10 +106,9 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
           ],
         );
       },
-    );
+    ).then((_) => controller.dispose());
   }
 
-  // Simulate pick-up time (current time + 30 minutes)
   String get _pickUpTime {
     final now = DateTime.now();
     final pickUpTime = now.add(const Duration(minutes: 30));
@@ -131,32 +126,26 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     final cart = Provider.of<CartProvider>(context);
     final bool isCartEmpty = cart.items.isEmpty;
 
-    // Determine delivery fee and address based on cart state
-    final int deliveryFee =
-        isCartEmpty ? 0 : 5000; // Fixed at 5000 for both methods
+    final int deliveryFee = isCartEmpty ? 0 : 5000;
     final String orderAddress =
         _deliveryMethod == 'Pick Up' ? _storeLocation : _deliveryAddress;
     final double cartTotal = cart.totalPrice;
-    final double discountAmount =
-        _discountApplied && !isCartEmpty ? 4000 : 0; // Discount is 4000
+    final double discountAmount = _discountApplied && !isCartEmpty ? 4000 : 0;
     final double total = cartTotal + deliveryFee - discountAmount;
 
-    // Initial camera position for Jakarta
     final initialCameraPosition = CameraPosition(
       target: _storePosition,
       zoom: 14.0,
     );
 
-    void _onMapCreated(GoogleMapController controller) {
+    void onMapCreated(GoogleMapController controller) {
       mapController = controller;
-      // Force camera update to ensure map renders
       Future.delayed(const Duration(milliseconds: 100), () {
-        controller.animateCamera(
-          CameraUpdate.newLatLngZoom(_storePosition, 14.0),
-        );
-        setState(() {
-          _mapReady = true;
-        });
+        if (mounted) {
+          controller.animateCamera(
+            CameraUpdate.newLatLngZoom(_storePosition, 14.0),
+          );
+        }
       });
     }
 
@@ -312,7 +301,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: GoogleMap(
-                        onMapCreated: _onMapCreated,
+                        onMapCreated: onMapCreated,
                         initialCameraPosition: initialCameraPosition,
                         mapType: MapType.normal,
                         zoomControlsEnabled: false,
@@ -476,10 +465,10 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          Row(
+                          const Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 'Payment Summary',
                                 style: TextStyle(
                                   fontSize: 18,
@@ -573,7 +562,6 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                             context,
                             listen: false,
                           );
-                          // Placeholder for Firebase order insertion
                           if (_deliveryMethod == 'Deliver') {
                             Navigator.push(
                               context,

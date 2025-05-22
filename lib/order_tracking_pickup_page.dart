@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'home_page.dart'; // Ensure this file exists or adjust the import
+import 'home_page.dart';
 
 class OrderTrackingPickupPage extends StatefulWidget {
-  final String storeLocation;
-  final String pickUpTime;
-  final double total;
-  final List<dynamic> items;
-  final String paymentMethod;
-
   const OrderTrackingPickupPage({
     super.key,
     required this.storeLocation,
@@ -18,27 +12,30 @@ class OrderTrackingPickupPage extends StatefulWidget {
     required this.paymentMethod,
   });
 
+  final String storeLocation;
+  final String pickUpTime;
+  final double total;
+  final List<dynamic> items;
+  final String paymentMethod;
+
   @override
-  _OrderTrackingPickupPageState createState() =>
+  State<OrderTrackingPickupPage> createState() =>
       _OrderTrackingPickupPageState();
 }
 
 class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
   GoogleMapController? mapController;
-  final LatLng _storePosition = const LatLng(
-    -6.1745,
-    106.8227,
-  ); // Store in Jakarta
+  final LatLng _storePosition = const LatLng(-6.1745, 106.8227);
   final Set<Marker> _markers = {};
 
   @override
   void initState() {
     super.initState();
     _markers.add(
-      Marker(
-        markerId: const MarkerId('store_location'),
-        position: _storePosition,
-        infoWindow: const InfoWindow(title: 'Bakery Delight'),
+      const Marker(
+        markerId: MarkerId('store_location'),
+        position: LatLng(-6.1745, 106.8227),
+        infoWindow: InfoWindow(title: 'Bakery Delight'),
       ),
     );
   }
@@ -61,23 +58,15 @@ class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Map taking up 70% of the screen
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom:
-                MediaQuery.of(context).size.height *
-                0.3, // 70% of screen height
-            child: GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _storePosition,
-                zoom: 14.0,
-              ),
-              mapType: MapType.normal,
-              markers: _markers,
+          // Map taking up the full screen
+          GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: const CameraPosition(
+              target: LatLng(-6.1745, 106.8227),
+              zoom: 14.0,
             ),
+            mapType: MapType.normal,
+            markers: _markers,
           ),
           // Home button at top left
           Positioned(
@@ -89,63 +78,81 @@ class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const HomePage()),
-                  (route) => false, // Clear the navigation stack
+                  (route) => false,
                 );
               },
             ),
           ),
-          // White tab with rounded corners at the bottom 30%
+          // Semi-transparent overlay for content
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            height:
-                MediaQuery.of(context).size.height *
-                0.3, // 30% of screen height
             child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, -3),
-                  ),
-                ],
-              ),
               padding: const EdgeInsets.all(16.0),
+              color: Colors.white.withAlpha(
+                229,
+              ), // Replaced withOpacity with withAlpha
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Order Tracking',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Pick Up Time',
-                        style: TextStyle(fontSize: 16),
+                  // 1. Pick up time
+                  Center(
+                    child: Text(
+                      widget.pickUpTime,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
-                      Text(
-                        widget.pickUpTime,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Store Address: ${widget.storeLocation}',
-                    style: const TextStyle(fontSize: 16),
+                  const Center(
+                    child: Text(
+                      'Pick up time',
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // 2. Store Address title and location
+                  const Center(
+                    child: Text(
+                      'Store Address',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Center(
+                    child: Text(
+                      widget.storeLocation,
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // 3. Order picked up button at the bottom
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/order-finished');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange[700],
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Order picked up',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
                   ),
                 ],
               ),

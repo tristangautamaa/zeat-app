@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'home_page.dart'; // Ensure this file exists or adjust the import
+import 'package:url_launcher/url_launcher.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'home_page.dart';
 
 class OrderTrackingDeliveryPage extends StatefulWidget {
-  final String orderAddress;
-  final double total;
-  final List<dynamic> items;
-  final int deliveryFee;
-  final String paymentMethod;
-
   const OrderTrackingDeliveryPage({
     super.key,
     required this.orderAddress,
@@ -18,38 +14,38 @@ class OrderTrackingDeliveryPage extends StatefulWidget {
     required this.paymentMethod,
   });
 
+  final String orderAddress;
+  final double total;
+  final List<dynamic> items;
+  final int deliveryFee;
+  final String paymentMethod;
+
   @override
-  _OrderTrackingDeliveryPageState createState() =>
+  State<OrderTrackingDeliveryPage> createState() =>
       _OrderTrackingDeliveryPageState();
 }
 
 class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
   GoogleMapController? mapController;
-  final LatLng _storePosition = const LatLng(
-    -6.1745,
-    106.8227,
-  ); // Store in Jakarta
-  final LatLng _deliveryPosition = const LatLng(
-    -5.1477,
-    105.1985,
-  ); // Bandar Lampung (approximate)
+  final LatLng _storePosition = const LatLng(-6.1745, 106.8227);
+  final LatLng _deliveryPosition = const LatLng(-5.1477, 105.1985);
   final Set<Marker> _markers = {};
 
   @override
   void initState() {
     super.initState();
     _markers.add(
-      Marker(
-        markerId: const MarkerId('store_location'),
-        position: _storePosition,
-        infoWindow: const InfoWindow(title: 'Bakery Delight'),
+      const Marker(
+        markerId: MarkerId('store_location'),
+        position: LatLng(-6.1745, 106.8227),
+        infoWindow: InfoWindow(title: 'Bakery Delight'),
       ),
     );
     _markers.add(
-      Marker(
-        markerId: const MarkerId('delivery_location'),
-        position: _deliveryPosition,
-        infoWindow: const InfoWindow(title: 'Delivery Location'),
+      const Marker(
+        markerId: MarkerId('delivery_location'),
+        position: LatLng(-5.1477, 105.1985),
+        infoWindow: InfoWindow(title: 'Delivery Location'),
       ),
     );
   }
@@ -82,40 +78,52 @@ class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
                 : _deliveryPosition.longitude,
           ),
         ),
-        50.0, // Padding
+        50.0,
       ),
     );
   }
 
+  Future<void> _makingPhoneCall() async {
+    final status = await Permission.phone.request();
+    if (status.isGranted) {
+      final launchUri = Uri(scheme: 'tel', path: '+62817209700');
+      if (await canLaunchUrl(launchUri)) {
+        await launchUrl(launchUri);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not launch dialer')),
+          );
+        }
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Phone permission denied')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Simulate estimated delivery time (current time + 45 minutes)
-    final now = DateTime.now();
-    final estimatedDeliveryTime = now.add(const Duration(minutes: 45));
-    final formattedTime = TimeOfDay.fromDateTime(
-      estimatedDeliveryTime,
-    ).format(context);
+    final truncatedAddress =
+        widget.orderAddress.length > 20
+            ? '${widget.orderAddress.substring(0, 20)}...'
+            : widget.orderAddress;
 
     return Scaffold(
       body: Stack(
         children: [
-          // Map taking up 70% of the screen
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom:
-                MediaQuery.of(context).size.height *
-                0.3, // 70% of screen height
-            child: GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _storePosition,
-                zoom: 14.0,
-              ),
-              mapType: MapType.normal,
-              markers: _markers,
+          // Map taking up the full screen
+          GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: const CameraPosition(
+              target: LatLng(-6.1745, 106.8227),
+              zoom: 14.0,
             ),
+            mapType: MapType.normal,
+            markers: _markers,
           ),
           // Home button at top left
           Positioned(
@@ -127,72 +135,141 @@ class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => const HomePage()),
-                  (route) => false, // Clear the navigation stack
+                  (route) => false,
                 );
               },
             ),
           ),
-          // White tab with rounded corners at the bottom 30%
+          // Semi-transparent overlay for content
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            height:
-                MediaQuery.of(context).size.height *
-                0.3, // 30% of screen height
             child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(20),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, -3),
-                  ),
-                ],
-              ),
               padding: const EdgeInsets.all(16.0),
+              color: Colors.white.withAlpha(
+                229,
+              ), // Replaced withOpacity with withAlpha
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Order Tracking',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  // 1. "10 minutes left" black bold, top and center
+                  const Center(
+                    child: Text(
+                      '10 minutes left',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
+                  // 2. "Delivery to" and truncated address
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Estimated Delivery Time',
-                        style: TextStyle(fontSize: 16),
+                        'Delivery to',
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                       Text(
-                        formattedTime,
+                        truncatedAddress,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
+                  const Divider(color: Colors.grey, thickness: 1, height: 20),
+                  const SizedBox(height: 12),
+                  // 3. Motorcycle icon and text, aligned to the right
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.motorcycle,
+                          size: 30,
+                          color: Colors.orange[700],
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'On the way to restaurant',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              Text(
+                                'We will deliver your goods to you in the shortest possible time.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // 4. Driver image, name, motorcycle name, and call button
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Driver Information',
-                        style: TextStyle(fontSize: 16),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          'assets/driver.jpg',
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                          errorBuilder:
+                              (context, error, stackTrace) =>
+                                  const Icon(Icons.person, size: 60),
+                        ),
                       ),
-                      const Text(
-                        'John Doe - +62 812-3456-7890',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                      // Removed SizedBox to make info stick to image
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Yohanes Vincentius',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Ninja H2R',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.green[100],
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.phone, color: Colors.green),
+                          onPressed: _makingPhoneCall,
                         ),
                       ),
                     ],

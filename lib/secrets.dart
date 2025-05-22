@@ -1,1 +1,4 @@
-const String apiKey = 'AIzaSyCqQyExDjlRp5ZvEDfx7Q1_xH9gNAkmB-U';
+class Secrets {
+  static const String googleMapsApiKey =
+      'AIzaSyBDc2HaJmoMetyszbBdprN2pL1uylj8iFc'; // Replace with your actual API key
+}
