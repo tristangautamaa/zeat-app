@@ -4,13 +4,18 @@ import 'welcome_page.dart';
 import 'sign_in_page.dart';
 import 'sign_up_page.dart';
 import 'home_page.dart';
+import 'chatbot_page.dart';
+import 'profile_page.dart';
 import 'menu_item_detail_page.dart';
 import 'shopping_cart_page.dart';
 import 'cart_provider.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(create: (context) => CartProvider(), child: MyApp()),
+    ChangeNotifierProvider(
+      create: (context) => CartProvider(),
+      child: const MyApp(),
+    ),
   );
 }
 
@@ -23,18 +28,20 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/landing',
       routes: {
-        '/landing': (context) => LandingPage(),
-        '/welcome': (context) => WelcomePage(),
-        '/sign-in': (context) => SignInPage(),
-        '/sign-up': (context) => SignUpPage(),
-        '/home': (context) => HomePage(),
+        '/landing': (context) => const LandingPage(),
+        '/welcome': (context) => const WelcomePage(),
+        '/sign-in': (context) => const SignInPage(),
+        '/sign-up': (context) => const SignUpPage(),
+        '/home': (context) => const HomePage(),
+        '/chatbot': (context) => const ChatbotPage(),
+        '/profile': (context) => const ProfilePage(),
         '/menu-item-detail': (context) {
           final String? menuItemId =
               ModalRoute.of(context)?.settings.arguments as String?;
           return MenuItemDetailPage(menuItemId: menuItemId ?? '');
         },
-        '/shopping-cart': (context) => ShoppingCartPage(),
-        '/order-tracking': (context) => OrderTrackingPage(),
+        '/shopping-cart': (context) => const ShoppingCartPage(),
+        '/order-tracking': (context) => const OrderTrackingPage(),
       },
     );
   }
@@ -52,7 +59,7 @@ class LandingPage extends StatelessWidget {
           Container(
             width: double.infinity,
             height: 500,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/bread-landing.png'),
                 fit: BoxFit.contain,
@@ -65,7 +72,7 @@ class LandingPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     'Pay less, Eat More!',
                     style: TextStyle(
                       fontSize: 32,
@@ -73,7 +80,7 @@ class LandingPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
@@ -101,12 +108,12 @@ class LandingPage extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.brown,
-                  padding: EdgeInsets.symmetric(vertical: 10),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                child: Text(
+                child: const Text(
                   'Get Started',
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
@@ -125,8 +132,8 @@ class OrderTrackingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Order Tracking')),
-      body: Center(
+      appBar: AppBar(title: const Text('Order Tracking')),
+      body: const Center(
         child: Text('Order placed! Tracking details will appear here.'),
       ),
     );

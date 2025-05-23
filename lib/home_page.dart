@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
-import 'chatbot_page.dart'; // Import the ChatbotPage
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -291,19 +290,13 @@ class HomePageState extends State<HomePage> {
         backgroundColor: Colors.brown,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white70,
-        currentIndex: 0, // Home page is the default
+        currentIndex: 0,
         onTap: (index) {
           if (index == 0) {
-            // Already on HomePage, do nothing
             return;
           } else if (index == 1) {
-            // Navigate to ChatbotPage
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ChatbotPage()),
-            );
+            Navigator.pushNamed(context, '/chatbot');
           } else if (index == 2) {
-            // Navigate to ProfilePage (placeholder route)
             Navigator.pushNamed(context, '/profile');
           }
         },
@@ -364,7 +357,6 @@ class MenuItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Adjust font size based on name length
     double nameFontSize = name.length > 12 ? 14.0 : 18.0;
 
     return GestureDetector(
