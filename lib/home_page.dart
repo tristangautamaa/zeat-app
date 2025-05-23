@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'chatbot_page.dart'; // Import the ChatbotPage
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -290,8 +291,22 @@ class HomePageState extends State<HomePage> {
         backgroundColor: Colors.brown,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white70,
-        currentIndex: 0,
-        onTap: (index) {},
+        currentIndex: 0, // Home page is the default
+        onTap: (index) {
+          if (index == 0) {
+            // Already on HomePage, do nothing
+            return;
+          } else if (index == 1) {
+            // Navigate to ChatbotPage
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ChatbotPage()),
+            );
+          } else if (index == 2) {
+            // Navigate to ProfilePage (placeholder route)
+            Navigator.pushNamed(context, '/profile');
+          }
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chatbot'),
