@@ -13,8 +13,39 @@ class ProfilePageState extends State<ProfilePage> {
   bool _hasProfileImage = false;
 
   Future<void> _pickImage() async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Upload Image'),
+            content: const Text('Select an image from your gallery?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Select'),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed == true) {
+      setState(() {
+        _hasProfileImage = true; // Set to true only if user selects an image
+      });
+    } else {
+      setState(() {
+        _hasProfileImage = false; // Reset to default image if user cancels
+      });
+    }
+  }
+
+  void _resetToDefault() {
     setState(() {
-      _hasProfileImage = true;
+      _hasProfileImage = false; // Revert to default image
     });
   }
 
@@ -44,18 +75,54 @@ class ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    GestureDetector(
-                      onTap: _pickImage,
-                      child: CircleAvatar(
-                        radius: 60,
-                        backgroundImage:
-                            _hasProfileImage
-                                ? const NetworkImage(
-                                  'https://via.placeholder.com/150',
-                                )
-                                : const AssetImage('assets/default-profile.png')
-                                    as ImageProvider,
-                      ),
+                    Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        CircleAvatar(
+                          radius: 60,
+                          backgroundImage:
+                              _hasProfileImage
+                                  ? const NetworkImage(
+                                    'https://via.placeholder.com/150',
+                                  )
+                                  : const AssetImage(
+                                        'assets/default-profile.png',
+                                      )
+                                      as ImageProvider,
+                          backgroundColor: Colors.grey[800],
+                          foregroundColor: Colors.transparent,
+                          child:
+                              _hasProfileImage
+                                  ? null
+                                  : Image.asset(
+                                    'assets/default-profile.png',
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(
+                                        Icons.error,
+                                        color: Colors.red,
+                                        size: 40,
+                                      );
+                                    },
+                                  ),
+                        ),
+                        if (_hasProfileImage)
+                          GestureDetector(
+                            onTap: _resetToDefault,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.brown,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.refresh,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 20),
                     const Text(
@@ -72,6 +139,12 @@ class ProfilePageState extends State<ProfilePage> {
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     const SizedBox(height: 30),
+                    _buildMenuItem(
+                      icon: Icons.upload,
+                      title: 'Upload Image',
+                      onTap: _pickImage,
+                    ),
+                    const SizedBox(height: 10),
                     _buildMenuItem(
                       icon: Icons.help_outline,
                       title: 'Support and Help',
@@ -119,9 +192,7 @@ class ProfilePageState extends State<ProfilePage> {
         margin: const EdgeInsets.symmetric(horizontal: 20),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: Colors.grey[800]?.withValues(
-            alpha: 0.7,
-          ), // Updated to withValues(alpha: 0.7)
+          color: Colors.grey[800]?.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(
