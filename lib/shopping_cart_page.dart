@@ -23,6 +23,8 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   GoogleMapController? mapController;
   final LatLng _storePosition = const LatLng(-6.1745, 106.8227);
   final Set<Marker> _markers = {};
+  late TextEditingController _addressController; // For address
+  late TextEditingController _voucherController; // For voucher
 
   @override
   void initState() {
@@ -36,6 +38,9 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
       ),
     );
     _requestLocationPermission();
+    _addressController = TextEditingController(text: _deliveryAddress);
+    _voucherController =
+        TextEditingController(); // Initialize voucher controller
   }
 
   Future<void> _requestLocationPermission() async {
@@ -46,32 +51,33 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   void _editAddress() {
-    final controller = TextEditingController(text: _deliveryAddress);
-    String newAddress = _deliveryAddress;
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Edit Address'),
           content: TextField(
-            controller: controller,
-            onChanged: (value) => newAddress = value,
+            controller: _addressController,
             decoration: const InputDecoration(hintText: 'Enter new address'),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 setState(() {
-                  _deliveryAddress = newAddress;
+                  _deliveryAddress = _addressController.text;
                 });
                 Navigator.pop(context);
               },
               child: const Text('Save'),
             ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
           ],
         );
       },
-    ).then((_) => controller.dispose());
+    );
   }
 
   void _applyDiscount(String code) {
@@ -83,30 +89,34 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   void _showVoucherDialog() {
-    final controller = TextEditingController();
-    String voucherCode = '';
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Enter Voucher Code'),
           content: TextField(
-            controller: controller,
-            onChanged: (value) => voucherCode = value,
+            controller: _voucherController,
             decoration: const InputDecoration(hintText: 'Enter code'),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                _applyDiscount(voucherCode);
+                _applyDiscount(_voucherController.text);
                 Navigator.pop(context);
               },
               child: const Text('Apply'),
             ),
+            TextButton(
+              onPressed: () {
+                _voucherController.clear(); // Clear input on cancel
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
           ],
         );
       },
-    ).then((_) => controller.dispose());
+    );
   }
 
   String get _pickUpTime {
@@ -117,6 +127,8 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
 
   @override
   void dispose() {
+    _addressController.dispose();
+    _voucherController.dispose();
     mapController?.dispose();
     super.dispose();
   }

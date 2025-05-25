@@ -9,6 +9,10 @@ import 'profile_page.dart';
 import 'menu_item_detail_page.dart';
 import 'shopping_cart_page.dart';
 import 'cart_provider.dart';
+import 'admin_login_page.dart';
+import 'admin_dashboard_page.dart';
+import 'location_page.dart'; // Add this import
+import 'menu_list_page.dart'; // Add this import
 
 void main() {
   runApp(
@@ -35,6 +39,10 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomePage(),
         '/chatbot': (context) => const ChatbotPage(),
         '/profile': (context) => const ProfilePage(),
+        '/admin-login': (context) => const AdminLoginPage(),
+        '/admin-dashboard': (context) => const AdminDashboardPage(),
+        '/location': (context) => const LocationPage(), // Updated route
+        '/menu-list': (context) => const MenuListPage(), // Updated route
         '/menu-item-detail': (context) {
           final String? menuItemId =
               ModalRoute.of(context)?.settings.arguments as String?;
