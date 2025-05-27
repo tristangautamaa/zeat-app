@@ -39,10 +39,10 @@ class AdminLoginPageState extends State<AdminLoginPage> {
       appBar: AppBar(
         title: const Text('Admin Login'),
         backgroundColor: Colors.black,
-        leading: const Icon(Icons.arrow_back), // Back arrow
+        leading: const Icon(Icons.arrow_back),
       ),
       body: Container(
-        color: Colors.pink[50], // Light pink background
+        color: Colors.pink[50],
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -117,7 +117,7 @@ class AdminLoginPageState extends State<AdminLoginPage> {
                   ),
                 ),
               ),
-              const Spacer(), // Pushes the menu icon to the bottom
+              const Spacer(),
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(

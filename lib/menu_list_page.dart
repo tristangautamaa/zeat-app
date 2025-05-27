@@ -9,8 +9,7 @@ class MenuListPage extends StatefulWidget {
 }
 
 class MenuListPageState extends State<MenuListPage> {
-  // Fake data for menu items (to be replaced with Firebase later)
-  List<Map<String, dynamic>> _menuItems = [
+  final List<Map<String, dynamic>> _menuItems = [
     {
       'name': 'Chocolate Croissant',
       'description': 'A flaky croissant with rich chocolate filling.',
@@ -74,8 +73,7 @@ class MenuListPageState extends State<MenuListPage> {
                       'name': nameController.text,
                       'description': descriptionController.text,
                       'price': double.tryParse(priceController.text) ?? 0.0,
-                      'image':
-                          'assets/placeholder_food.png', // Placeholder image
+                      'image': 'assets/placeholder_food.png',
                     });
                   });
                 }
@@ -146,8 +144,7 @@ class MenuListPageState extends State<MenuListPage> {
                       'name': nameController.text,
                       'description': descriptionController.text,
                       'price': double.tryParse(priceController.text) ?? 0.0,
-                      'image':
-                          _menuItems[index]['image'], // Retain the same image
+                      'image': _menuItems[index]['image'],
                     };
                   });
                 }
@@ -224,7 +221,6 @@ class MenuListPageState extends State<MenuListPage> {
             ),
             child: Row(
               children: [
-                // Placeholder image (replace with actual asset if available)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.asset(

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "453079085352",
+    "project_id": "zeat-app",
+    "storage_bucket": "zeat-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:453079085352:android:cd64d89398f4a8da43a01d",
+        "android_client_info": {
+          "package_name": "com.example.final_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAO9jom5uGhwUOTmGEZN4q7-dZseWQxcnw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

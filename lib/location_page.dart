@@ -8,8 +8,7 @@ class LocationPage extends StatefulWidget {
 }
 
 class LocationPageState extends State<LocationPage> {
-  // Fake data for locations (to be replaced with database later)
-  List<Map<String, String>> _locations = [
+  final List<Map<String, String>> _locations = [
     {'address': 'Jl. Merdeka No. 123, Jakarta', 'city': 'Jakarta'},
     {'address': 'Jl. Sudirman No. 456, Bandung', 'city': 'Bandung'},
   ];

@@ -58,6 +58,8 @@ flutter:
   assets:
     - assets/bread-landing.png
     - assets/texture-one.png
+    - assets/texture-two.png
+    - assets/texture-three.png
     - assets/home-discount.png
     - assets/croissant.jpg
     - assets/pain-au-chocolat.jpg
