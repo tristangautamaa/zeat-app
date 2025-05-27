@@ -23,8 +23,8 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   GoogleMapController? mapController;
   final LatLng _storePosition = const LatLng(-6.1745, 106.8227);
   final Set<Marker> _markers = {};
-  late TextEditingController _addressController; // For address
-  late TextEditingController _voucherController; // For voucher
+  late TextEditingController _addressController;
+  late TextEditingController _voucherController;
 
   @override
   void initState() {
@@ -39,15 +39,12 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     );
     _requestLocationPermission();
     _addressController = TextEditingController(text: _deliveryAddress);
-    _voucherController =
-        TextEditingController(); // Initialize voucher controller
+    _voucherController = TextEditingController();
   }
 
   Future<void> _requestLocationPermission() async {
     final status = await Permission.location.request();
-    if (status.isGranted && mounted) {
-      setState(() {});
-    }
+    if (status.isGranted && mounted) setState(() {});
   }
 
   void _editAddress() {
@@ -62,12 +59,10 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                setState(() {
-                  _deliveryAddress = _addressController.text;
-                });
-                Navigator.pop(context);
-              },
+              onPressed:
+                  () => setState(
+                    () => _deliveryAddress = _addressController.text,
+                  ),
               child: const Text('Save'),
             ),
             TextButton(
@@ -81,11 +76,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
   }
 
   void _applyDiscount(String code) {
-    if (code == 'DISKON50') {
-      setState(() {
-        _discountApplied = true;
-      });
-    }
+    if (code == 'DISKON50') setState(() => _discountApplied = true);
   }
 
   void _showVoucherDialog() {
@@ -100,17 +91,11 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                _applyDiscount(_voucherController.text);
-                Navigator.pop(context);
-              },
+              onPressed: () => _applyDiscount(_voucherController.text),
               child: const Text('Apply'),
             ),
             TextButton(
-              onPressed: () {
-                _voucherController.clear(); // Clear input on cancel
-                Navigator.pop(context);
-              },
+              onPressed: () => _voucherController.clear(),
               child: const Text('Cancel'),
             ),
           ],
@@ -138,26 +123,20 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
     final cart = Provider.of<CartProvider>(context);
     final bool isCartEmpty = cart.items.isEmpty;
 
-    final int deliveryFee = isCartEmpty ? 0 : 5000;
+    final num deliveryFee = isCartEmpty ? 0 : 5000;
     final String orderAddress =
         _deliveryMethod == 'Pick Up' ? _storeLocation : _deliveryAddress;
-    final double cartTotal = cart.totalPrice;
-    final double discountAmount = _discountApplied && !isCartEmpty ? 4000 : 0;
-    final double total = cartTotal + deliveryFee - discountAmount;
-
-    final initialCameraPosition = CameraPosition(
-      target: _storePosition,
-      zoom: 14.0,
-    );
+    final num cartTotal = cart.totalPrice;
+    final num discountAmount = _discountApplied && !isCartEmpty ? 4000 : 0;
+    final num total = cartTotal + deliveryFee - discountAmount;
 
     void onMapCreated(GoogleMapController controller) {
       mapController = controller;
       Future.delayed(const Duration(milliseconds: 100), () {
-        if (mounted) {
+        if (mounted)
           controller.animateCamera(
             CameraUpdate.newLatLngZoom(_storePosition, 14.0),
           );
-        }
       });
     }
 
@@ -168,9 +147,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, size: 30, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Order',
@@ -186,7 +163,6 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
         children: [
           Column(
             children: [
-              // Non-scrollable middle section
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
@@ -314,7 +290,10 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                       borderRadius: BorderRadius.circular(8),
                       child: GoogleMap(
                         onMapCreated: onMapCreated,
-                        initialCameraPosition: initialCameraPosition,
+                        initialCameraPosition: const CameraPosition(
+                          target: LatLng(-6.1745, 106.8227),
+                          zoom: 14.0,
+                        ),
                         mapType: MapType.normal,
                         zoomControlsEnabled: false,
                         zoomGesturesEnabled: false,
@@ -365,7 +344,6 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                   ),
                 ),
               ),
-              // Scrollable items section
               Expanded(
                 child:
                     isCartEmpty
@@ -390,26 +368,20 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                                         Icons.delete,
                                         color: Colors.red,
                                       ),
-                                      onPressed: () {
-                                        cart.removeItem(item.id);
-                                      },
+                                      onPressed: () => cart.removeItem(item.id),
                                     ),
                                     Image.asset(
                                       item.image,
                                       width: 40,
                                       height: 40,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (
-                                        context,
-                                        error,
-                                        stackTrace,
-                                      ) {
-                                        return const Icon(
-                                          Icons.error,
-                                          size: 40,
-                                          color: Colors.red,
-                                        );
-                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(
+                                                Icons.error,
+                                                size: 40,
+                                                color: Colors.red,
+                                              ),
                                     ),
                                     const SizedBox(width: 8),
                                     Expanded(
@@ -440,16 +412,18 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                                       children: [
                                         IconButton(
                                           icon: const Icon(Icons.remove),
-                                          onPressed: () {
-                                            cart.decreaseQuantity(item.id);
-                                          },
+                                          onPressed:
+                                              () => cart.decreaseQuantity(
+                                                item.id,
+                                              ),
                                         ),
                                         Text('${item.quantity}'),
                                         IconButton(
                                           icon: const Icon(Icons.add),
-                                          onPressed: () {
-                                            cart.increaseQuantity(item.id);
-                                          },
+                                          onPressed:
+                                              () => cart.increaseQuantity(
+                                                item.id,
+                                              ),
                                         ),
                                       ],
                                     ),
@@ -557,23 +531,15 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                           DropdownMenuItem(value: 'Cash', child: Text('Cash')),
                           DropdownMenuItem(value: 'QRIS', child: Text('QRIS')),
                         ],
-                        onChanged: (String? newValue) {
-                          if (newValue != null) {
-                            setState(() {
-                              _paymentMethod = newValue;
-                            });
-                          }
-                        },
+                        onChanged:
+                            (String? newValue) =>
+                                setState(() => _paymentMethod = newValue!),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          final cart = Provider.of<CartProvider>(
-                            context,
-                            listen: false,
-                          );
                           if (_deliveryMethod == 'Deliver') {
                             Navigator.push(
                               context,
@@ -581,9 +547,11 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                                 builder:
                                     (context) => OrderTrackingDeliveryPage(
                                       orderAddress: orderAddress,
-                                      total: total,
+                                      total:
+                                          total
+                                              .toDouble(), // Convert num to double
                                       items: cart.items,
-                                      deliveryFee: deliveryFee,
+                                      deliveryFee: deliveryFee.toInt(),
                                       paymentMethod: _paymentMethod,
                                     ),
                               ),
@@ -596,7 +564,7 @@ class ShoppingCartPageState extends State<ShoppingCartPage> {
                                     (context) => OrderTrackingPickupPage(
                                       storeLocation: _storeLocation,
                                       pickUpTime: _pickUpTime,
-                                      total: total,
+                                      total: total.toDouble(),
                                       items: cart.items,
                                       paymentMethod: _paymentMethod,
                                     ),

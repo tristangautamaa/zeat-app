@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'home_page.dart';
@@ -22,19 +20,14 @@ class _ThankYouPageState extends State<ThankYouPage> {
   @override
   void initState() {
     super.initState();
-    // Reset cart after the widget is fully built
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final cart = Provider.of<CartProvider>(context, listen: false);
-      cart.clearCart();
+      Provider.of<CartProvider>(context, listen: false).clearCart();
     });
-    // Auto-redirect to home page after 5 seconds
     Future.delayed(const Duration(seconds: 5), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
     });
   }
 
@@ -67,7 +60,7 @@ class _ThankYouPageState extends State<ThankYouPage> {
               ),
             ),
             SizedBox(height: screenHeight * 0.01),
-            Text(
+            const Text(
               "Payment Done Successfully",
               style: TextStyle(
                 color: Colors.black87,
@@ -76,7 +69,7 @@ class _ThankYouPageState extends State<ThankYouPage> {
               ),
             ),
             SizedBox(height: screenHeight * 0.05),
-            Text(
+            const Text(
               "You will be redirected to the home page shortly\nor click here to return to home page",
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -87,14 +80,11 @@ class _ThankYouPageState extends State<ThankYouPage> {
             ),
             SizedBox(height: screenHeight * 0.06),
             ElevatedButton(
-              onPressed: () {
-                if (mounted) {
-                  Navigator.pushReplacement(
+              onPressed:
+                  () => Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const HomePage()),
-                  );
-                }
-              },
+                  ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.brown[300],
                 padding: const EdgeInsets.symmetric(

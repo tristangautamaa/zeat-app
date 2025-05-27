@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'firestore_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'welcome_page.dart';
@@ -11,10 +13,13 @@ import 'shopping_cart_page.dart';
 import 'cart_provider.dart';
 import 'admin_login_page.dart';
 import 'admin_dashboard_page.dart';
-import 'location_page.dart'; // Add this import
-import 'menu_list_page.dart'; // Add this import
+import 'location_page.dart';
+import 'menu_list_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  await FirestoreSetup.initializeData();
   runApp(
     ChangeNotifierProvider(
       create: (context) => CartProvider(),
@@ -41,12 +46,13 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => const ProfilePage(),
         '/admin-login': (context) => const AdminLoginPage(),
         '/admin-dashboard': (context) => const AdminDashboardPage(),
-        '/location': (context) => const LocationPage(), // Updated route
-        '/menu-list': (context) => const MenuListPage(), // Updated route
+        '/location': (context) => const LocationPage(),
+        '/menu-list': (context) => const MenuListPage(),
         '/menu-item-detail': (context) {
-          final String? menuItemId =
-              ModalRoute.of(context)?.settings.arguments as String?;
-          return MenuItemDetailPage(menuItemId: menuItemId ?? '');
+          final Map<String, dynamic>? itemData =
+              ModalRoute.of(context)?.settings.arguments
+                  as Map<String, dynamic>?;
+          return MenuItemDetailPage(itemData: itemData);
         },
         '/shopping-cart': (context) => const ShoppingCartPage(),
         '/order-tracking': (context) => const OrderTrackingPage(),
@@ -55,9 +61,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class LandingPage extends StatelessWidget {
+class LandingPage extends StatefulWidget {
   const LandingPage({super.key});
 
+  @override
+  LandingPageState createState() => LandingPageState();
+}
+
+class LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,8 +100,8 @@ class LandingPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
                       'Where sweet treats meet sweet deals.\nIndulge in delightful pastries without the guilt or the high price!',
                       textAlign: TextAlign.center,
@@ -111,9 +122,7 @@ class LandingPage extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/welcome');
-                },
+                onPressed: () => Navigator.pushNamed(context, '/welcome'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.brown,
                   padding: const EdgeInsets.symmetric(vertical: 10),
@@ -134,9 +143,14 @@ class LandingPage extends StatelessWidget {
   }
 }
 
-class OrderTrackingPage extends StatelessWidget {
+class OrderTrackingPage extends StatefulWidget {
   const OrderTrackingPage({super.key});
 
+  @override
+  OrderTrackingPageState createState() => OrderTrackingPageState();
+}
+
+class OrderTrackingPageState extends State<OrderTrackingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

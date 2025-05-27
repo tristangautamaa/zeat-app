@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'home_page.dart';
 import 'thank_you_page.dart';
+import 'cart_provider.dart';
 
 class OrderTrackingDeliveryPage extends StatefulWidget {
   const OrderTrackingDeliveryPage({
@@ -17,7 +18,7 @@ class OrderTrackingDeliveryPage extends StatefulWidget {
 
   final String orderAddress;
   final double total;
-  final List<dynamic> items;
+  final List<CartItem> items;
   final int deliveryFee;
   final String paymentMethod;
 
@@ -60,31 +61,29 @@ class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) {
-        mapController?.animateCamera(
-          CameraUpdate.newLatLngBounds(
-            LatLngBounds(
-              southwest: LatLng(
-                _storePosition.latitude < _deliveryPosition.latitude
-                    ? _storePosition.latitude
-                    : _deliveryPosition.latitude,
-                _storePosition.longitude < _deliveryPosition.longitude
-                    ? _storePosition.longitude
-                    : _deliveryPosition.longitude,
-              ),
-              northeast: LatLng(
-                _storePosition.latitude > _deliveryPosition.latitude
-                    ? _storePosition.latitude
-                    : _deliveryPosition.latitude,
-                _storePosition.longitude > _deliveryPosition.longitude
-                    ? _storePosition.longitude
-                    : _deliveryPosition.longitude,
-              ),
+      mapController?.animateCamera(
+        CameraUpdate.newLatLngBounds(
+          LatLngBounds(
+            southwest: LatLng(
+              _storePosition.latitude < _deliveryPosition.latitude
+                  ? _storePosition.latitude
+                  : _deliveryPosition.latitude,
+              _storePosition.longitude < _deliveryPosition.longitude
+                  ? _storePosition.longitude
+                  : _deliveryPosition.longitude,
             ),
-            50.0,
+            northeast: LatLng(
+              _storePosition.latitude > _deliveryPosition.latitude
+                  ? _storePosition.latitude
+                  : _deliveryPosition.latitude,
+              _storePosition.longitude > _deliveryPosition.longitude
+                  ? _storePosition.longitude
+                  : _deliveryPosition.longitude,
+            ),
           ),
-        );
-      }
+          50.0,
+        ),
+      );
     });
   }
 
@@ -95,18 +94,14 @@ class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
       if (await canLaunchUrl(launchUri)) {
         await launchUrl(launchUri);
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not launch dialer')),
-          );
-        }
-      }
-    } else {
-      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Phone permission denied')),
+          const SnackBar(content: Text('Could not launch dialer')),
         );
       }
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Phone permission denied')));
     }
   }
 
@@ -122,36 +117,31 @@ class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
         leading: IconButton(
           icon: const Icon(Icons.home, size: 30, color: Colors.black),
           onPressed: () {
-            if (mounted) {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-                (route) => false,
-              );
-            }
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+              (route) => false,
+            );
           },
         ),
       ),
       body: SafeArea(
         child: Column(
           children: [
-            // "Order Received" button at the top
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (mounted) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (context) =>
-                                  const ThankYouPage(title: 'Order Received'),
-                        ),
-                      );
-                    }
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) =>
+                                const ThankYouPage(title: 'Order Received'),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange[700],
@@ -167,7 +157,6 @@ class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
                 ),
               ),
             ),
-            // Map taking up the remaining space
             Expanded(
               child: Stack(
                 children: [
@@ -180,7 +169,6 @@ class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
                     mapType: MapType.normal,
                     markers: _markers,
                   ),
-                  // Semi-transparent overlay for content at the bottom
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -191,7 +179,6 @@ class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 1. "10 minutes left" black bold, top and center
                           const Center(
                             child: Text(
                               '10 minutes left',
@@ -203,7 +190,6 @@ class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          // 2. "Delivery to" and truncated address
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -231,7 +217,6 @@ class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
                             height: 20,
                           ),
                           const SizedBox(height: 12),
-                          // 3. Motorcycle icon and text, aligned to the right
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
@@ -275,7 +260,6 @@ class _OrderTrackingDeliveryPageState extends State<OrderTrackingDeliveryPage> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          // 4. Driver image, name, motorcycle name, and call button
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [

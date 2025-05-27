@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'support_page.dart';
@@ -11,6 +13,76 @@ class ProfilePage extends StatefulWidget {
 
 class ProfilePageState extends State<ProfilePage> {
   bool _hasProfileImage = false;
+  String? _userName;
+  String? _userEmail;
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final userDoc =
+            await FirebaseFirestore.instance
+                .collection('Users')
+                .doc(user.uid)
+                .get();
+        if (userDoc.exists) {
+          if (mounted) {
+            setState(() {
+              _userEmail = userDoc.data()!['email'] ?? user.email;
+              _userName =
+                  userDoc.data()!['name']?.isNotEmpty == true
+                      ? userDoc.data()!['name']
+                      : _extractFirstWordFromEmail(_userEmail ?? user.email) ??
+                          'User';
+              _isLoading = false;
+            });
+          }
+        } else {
+          if (mounted) {
+            setState(() {
+              _errorMessage = 'User profile not found.';
+              _isLoading = false;
+            });
+          }
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _errorMessage = 'No user signed in.';
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Error fetching user data: $e';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // Helper method to extract the first word from the email
+  String? _extractFirstWordFromEmail(String? email) {
+    if (email == null || !email.contains('@')) return null;
+    final localPart = email.split('@')[0]; // Get part before @
+    final words = localPart.split('.'); // Split by dots or spaces
+    return words.isNotEmpty ? words[0] : null;
+  }
 
   Future<void> _pickImage() async {
     final bool? confirmed = await showDialog<bool>(
@@ -34,18 +106,18 @@ class ProfilePageState extends State<ProfilePage> {
 
     if (confirmed == true) {
       setState(() {
-        _hasProfileImage = true; // Set to true only if user selects an image
+        _hasProfileImage = true;
       });
     } else {
       setState(() {
-        _hasProfileImage = false; // Reset to default image if user cancels
+        _hasProfileImage = false;
       });
     }
   }
 
   void _resetToDefault() {
     setState(() {
-      _hasProfileImage = false; // Revert to default image
+      _hasProfileImage = false;
     });
   }
 
@@ -125,19 +197,36 @@ class ProfilePageState extends State<ProfilePage> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'Samuel Tjen',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'samueltjen@gmail.com',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
+                    _isLoading
+                        ? const CircularProgressIndicator()
+                        : _errorMessage != null
+                        ? Text(
+                          _errorMessage!,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 16,
+                          ),
+                        )
+                        : Column(
+                          children: [
+                            Text(
+                              _userName ?? 'User',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              _userEmail ?? '',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
                     const SizedBox(height: 30),
                     _buildMenuItem(
                       icon: Icons.upload,
@@ -162,6 +251,7 @@ class ProfilePageState extends State<ProfilePage> {
                       icon: Icons.logout,
                       title: 'Logout',
                       onTap: () {
+                        FirebaseAuth.instance.signOut();
                         Navigator.pushNamedAndRemoveUntil(
                           context,
                           '/landing',

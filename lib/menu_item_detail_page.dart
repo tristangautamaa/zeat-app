@@ -4,9 +4,9 @@ import 'package:intl/intl.dart';
 import 'cart_provider.dart';
 
 class MenuItemDetailPage extends StatefulWidget {
-  final String menuItemId;
+  final Map<String, dynamic>? itemData;
 
-  const MenuItemDetailPage({super.key, required this.menuItemId});
+  const MenuItemDetailPage({super.key, this.itemData});
 
   @override
   MenuItemDetailPageState createState() => MenuItemDetailPageState();
@@ -17,167 +17,24 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
   bool isLiked = false;
   bool isDescriptionExpanded = false;
 
-  final Map<String, Map<String, dynamic>> _menuItems = {
-    '1': {
-      'name': 'Croissant',
-      'category': 'Puff Pastry',
-      'price': 10000,
-      'image': 'assets/croissant.jpg',
-      'description':
-          'A flaky, buttery croissant with a golden crust, perfect for breakfast or a snack. Made with premium ingredients to ensure a melt-in-your-mouth experience.',
-      'rating': 4.5,
-    },
-    '2': {
-      'name': 'Pain au Chocolat',
-      'category': 'Puff Pastry',
-      'price': 12000,
-      'image': 'assets/pain-au-chocolat.jpg',
-      'description':
-          'A delightful puff pastry filled with rich dark chocolate, offering a perfect balance of crispy layers and gooey sweetness.',
-      'rating': 4.8,
-    },
-    '3': {
-      'name': 'Chicken Puff',
-      'category': 'Puff Pastry',
-      'price': 15000,
-      'image': 'assets/pastry-chicken-puff.jpg',
-      'description':
-          'A savory puff pastry filled with tender chicken and aromatic spices, ideal for a quick and satisfying meal.',
-      'rating': 4.2,
-    },
-    '4': {
-      'name': 'Apple Turnover',
-      'category': 'Puff Pastry',
-      'price': 14000,
-      'image': 'assets/apple-turnover.jpg',
-      'description':
-          'A classic puff pastry turnover stuffed with sweet, cinnamon-spiced apples, offering a delightful mix of textures.',
-      'rating': 4.6,
-    },
-    '5': {
-      'name': 'Apple Danish',
-      'category': 'Danish Pastry',
-      'price': 13000,
-      'image': 'assets/apple-danish.jpg',
-      'description':
-          'A tender Danish pastry topped with caramelized apples, finished with a light glaze for a sweet touch.',
-      'rating': 4.3,
-    },
-    '6': {
-      'name': 'Custard Danish',
-      'category': 'Danish Pastry',
-      'price': 13500,
-      'image': 'assets/custard-danish.jpg',
-      'description':
-          'A rich custard-filled Danish pastry with a flaky base, perfect for those who love creamy desserts.',
-      'rating': 4.7,
-    },
-    '7': {
-      'name': 'Blueberry Danish',
-      'category': 'Danish Pastry',
-      'price': 14000,
-      'image': 'assets/blueberry-danish.jpg',
-      'description':
-          'A Danish pastry bursting with fresh blueberries, topped with a drizzle of icing for extra sweetness.',
-      'rating': 4.4,
-    },
-    '8': {
-      'name': 'Strawberry Danish',
-      'category': 'Danish Pastry',
-      'price': 14500,
-      'image': 'assets/strawberry-danish.jpg',
-      'description':
-          'A flaky Danish pastry filled with juicy strawberries, offering a refreshing and sweet flavor.',
-      'rating': 4.9,
-    },
-    '9': {
-      'name': 'Fruit Tart',
-      'category': 'Shortcrust Pastry',
-      'price': 18000,
-      'image': 'assets/fruit-tart.jpg',
-      'description':
-          'A vibrant shortcrust tart filled with creamy custard and topped with an assortment of fresh fruits.',
-      'rating': 4.8,
-    },
-    '10': {
-      'name': 'Egg Tart',
-      'category': 'Shortcrust Pastry',
-      'price': 12000,
-      'image': 'assets/egg-tart.jpg',
-      'description':
-          'A classic egg tart with a silky custard filling in a crisp shortcrust shell, perfect for any time of day.',
-      'rating': 4.5,
-    },
-    '11': {
-      'name': 'Apple Tart',
-      'category': 'Shortcrust Pastry',
-      'price': 16000,
-      'image': 'assets/apple-tart.jpg',
-      'description':
-          'A rustic shortcrust tart with thinly sliced apples, baked to a golden perfection with a hint of cinnamon.',
-      'rating': 4.6,
-    },
-    '12': {
-      'name': 'Chocolate Tart',
-      'category': 'Shortcrust Pastry',
-      'price': 17000,
-      'image': 'assets/chocolate-tart.jpg',
-      'description':
-          'A decadent shortcrust tart filled with rich chocolate ganache, perfect for chocolate lovers.',
-      'rating': 4.9,
-    },
-    '13': {
-      'name': 'Vandbakkelseskrans',
-      'category': 'Choux Pastry',
-      'price': 20000,
-      'image': 'assets/vandbakkelseskrans.webp',
-      'description':
-          'A traditional Danish choux pastry ring, filled with cream and topped with icing, a true festive treat.',
-      'rating': 4.7,
-    },
-    '14': {
-      'name': 'Chocolate Choux',
-      'category': 'Choux Pastry',
-      'price': 13000,
-      'image': 'assets/chocolate-choux.jpg',
-      'description':
-          'A light choux pastry puff filled with chocolate cream, offering a delightful chocolatey experience.',
-      'rating': 4.4,
-    },
-    '15': {
-      'name': 'Eclair',
-      'category': 'Choux Pastry',
-      'price': 15000,
-      'image': 'assets/eclair.jpg',
-      'description':
-          'A classic eclair with a choux pastry shell, filled with vanilla cream and topped with chocolate glaze.',
-      'rating': 4.8,
-    },
-    '16': {
-      'name': 'Vanilla Cream Choux',
-      'category': 'Choux Pastry',
-      'price': 14000,
-      'image': 'assets/vanilla-cream-choux.jpg',
-      'description':
-          'A delicate choux pastry filled with smooth vanilla cream, dusted with powdered sugar for a simple delight.',
-      'rating': 4.5,
-    },
-  };
-
-  Map<String, dynamic>? get _currentItem => _menuItems[widget.menuItemId];
-
   @override
   Widget build(BuildContext context) {
-    if (_currentItem == null) {
-      return Scaffold(body: Center(child: Text('Item not found')));
+    if (widget.itemData == null) {
+      return const Scaffold(body: Center(child: Text('Item not found')));
     }
 
-    String displayDescription =
-        isDescriptionExpanded
-            ? _currentItem!['description']
-            : _currentItem!['description'].length > 100
-            ? _currentItem!['description'].substring(0, 100) + '... '
-            : _currentItem!['description'];
+    final item = widget.itemData!;
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final String description =
+        item['description'] ??
+        'A delicious pastry made with the finest ingredients.';
+    final String displayDescription =
+        isDescriptionExpanded || description.length <= 100
+            ? description
+            : '${description.substring(0, 100)}... ';
+    final double rating = 4.5;
+    final bool isDiscounted = false;
+    final double discountPrice = item['price'] * 0.9;
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -189,12 +46,14 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: Icon(Icons.arrow_back, size: 30, color: Colors.black),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    size: 30,
+                    color: Colors.black,
+                  ),
+                  onPressed: () => Navigator.pop(context),
                 ),
-                Text(
+                const Text(
                   'Detail',
                   style: TextStyle(
                     fontSize: 20,
@@ -208,12 +67,7 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                     size: 30,
                     color: isLiked ? Colors.red : Colors.black,
                   ),
-                  onPressed: () {
-                    if (!mounted) return;
-                    setState(() {
-                      isLiked = !isLiked;
-                    });
-                  },
+                  onPressed: () => setState(() => isLiked = !isLiked),
                 ),
               ],
             ),
@@ -229,21 +83,20 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20),
                         child: Image.asset(
-                          _currentItem!['image'],
+                          item['image'],
                           height: 300,
                           width: double.infinity,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Icon(
-                              Icons.error,
-                              size: 50,
-                              color: Colors.red,
-                            );
-                          },
+                          errorBuilder:
+                              (context, error, stackTrace) => const Icon(
+                                Icons.error,
+                                size: 50,
+                                color: Colors.red,
+                              ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -251,15 +104,15 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _currentItem!['name'],
-                              style: TextStyle(
+                              item['name'],
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
                             Text(
-                              _currentItem!['category'],
+                              item['category'],
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey[600],
@@ -269,11 +122,15 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                         ),
                         Row(
                           children: [
-                            Icon(Icons.star, color: Colors.amber, size: 24),
-                            SizedBox(width: 4),
+                            const Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 4),
                             Text(
-                              _currentItem!['rating'].toString(),
-                              style: TextStyle(
+                              rating.toString(),
+                              style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black,
                               ),
@@ -282,14 +139,14 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Container(
-                      margin: EdgeInsets.symmetric(horizontal: 16),
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
                       height: 1,
                       color: Colors.grey[300],
                     ),
-                    SizedBox(height: 16),
-                    Text(
+                    const SizedBox(height: 16),
+                    const Text(
                       'Description',
                       style: TextStyle(
                         fontSize: 24,
@@ -297,23 +154,21 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                         color: Colors.black,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     RichText(
                       text: TextSpan(
                         style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                         children: [
                           TextSpan(text: displayDescription),
                           if (!isDescriptionExpanded &&
-                              _currentItem!['description'].length > 100)
+                              description.length > 100)
                             WidgetSpan(
                               child: GestureDetector(
-                                onTap: () {
-                                  if (!mounted) return;
-                                  setState(() {
-                                    isDescriptionExpanded = true;
-                                  });
-                                },
-                                child: Text(
+                                onTap:
+                                    () => setState(
+                                      () => isDescriptionExpanded = true,
+                                    ),
+                                child: const Text(
                                   ' Read more',
                                   style: TextStyle(
                                     fontSize: 16,
@@ -326,8 +181,8 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 16),
-                    Text(
+                    const SizedBox(height: 16),
+                    const Text(
                       'Pack size',
                       style: TextStyle(
                         fontSize: 24,
@@ -335,20 +190,35 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                         color: Colors.black,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _buildSizeButton('Small'),
-                          SizedBox(width: 10),
-                          _buildSizeButton('Medium'),
-                          SizedBox(width: 10),
-                          _buildSizeButton('Large'),
+                          SizeButton(
+                            size: 'Small',
+                            selectedSize: selectedSize,
+                            onPressed:
+                                () => setState(() => selectedSize = 'Small'),
+                          ),
+                          const SizedBox(width: 10),
+                          SizeButton(
+                            size: 'Medium',
+                            selectedSize: selectedSize,
+                            onPressed:
+                                () => setState(() => selectedSize = 'Medium'),
+                          ),
+                          const SizedBox(width: 10),
+                          SizeButton(
+                            size: 'Large',
+                            selectedSize: selectedSize,
+                            onPressed:
+                                () => setState(() => selectedSize = 'Large'),
+                          ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -356,7 +226,7 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
           ),
           Container(
             color: Colors.grey[200],
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -368,8 +238,10 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                       style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                     Text(
-                      'Rp ${NumberFormat('#,###', 'id_ID').format(_currentItem!['price'])}',
-                      style: TextStyle(
+                      isDiscounted
+                          ? 'Rp ${NumberFormat('#,###', 'id_ID').format(discountPrice)}'
+                          : 'Rp ${NumberFormat('#,###', 'id_ID').format(item['price'])}',
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFFB3672B),
@@ -379,24 +251,23 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    final cart = Provider.of<CartProvider>(
-                      context,
-                      listen: false,
-                    );
-                    cart.addItem(
-                      widget.menuItemId,
-                      _currentItem!['name'],
-                      _currentItem!['price'].toDouble(),
-                      _currentItem!['image'],
+                    cartProvider.addItem(
+                      item['id'],
+                      item['name'],
+                      isDiscounted ? discountPrice : item['price'],
+                      item['image'],
                     );
                     Navigator.pushNamed(context, '/shopping-cart');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFB3672B),
-                    side: BorderSide(color: Color(0xFFB3672B)),
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    backgroundColor: const Color(0xFFB3672B),
+                    side: const BorderSide(color: Color(0xFFB3672B)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Buy Now',
                     style: TextStyle(
                       color: Colors.white,
@@ -412,24 +283,39 @@ class MenuItemDetailPageState extends State<MenuItemDetailPage> {
       ),
     );
   }
+}
 
-  Widget _buildSizeButton(String size) {
-    bool isSelected = selectedSize == size;
+class SizeButton extends StatefulWidget {
+  final String size;
+  final String selectedSize;
+  final VoidCallback onPressed;
+
+  const SizeButton({
+    super.key,
+    required this.size,
+    required this.selectedSize,
+    required this.onPressed,
+  });
+
+  @override
+  SizeButtonState createState() => SizeButtonState();
+}
+
+class SizeButtonState extends State<SizeButton> {
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = widget.selectedSize == widget.size;
     return OutlinedButton(
-      onPressed: () {
-        setState(() {
-          selectedSize = size;
-        });
-      },
+      onPressed: widget.onPressed,
       style: OutlinedButton.styleFrom(
-        side: BorderSide(color: Color(0xFFB3672B)),
-        backgroundColor: isSelected ? Color(0xFFB3672B) : Colors.grey[50],
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        side: const BorderSide(color: Color(0xFFB3672B)),
+        backgroundColor: isSelected ? const Color(0xFFB3672B) : Colors.grey[50],
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       ),
       child: Text(
-        size,
+        widget.size,
         style: TextStyle(
-          color: isSelected ? Colors.white : Color(0xFFB3672B),
+          color: isSelected ? Colors.white : const Color(0xFFB3672B),
           fontSize: 16,
         ),
       ),

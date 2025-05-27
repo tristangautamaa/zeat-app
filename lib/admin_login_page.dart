@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class AdminLoginPage extends StatefulWidget {
@@ -12,17 +14,83 @@ class AdminLoginPageState extends State<AdminLoginPage> {
   final _passwordController = TextEditingController();
   String? _errorMessage;
 
-  void _signInAsAdmin() {
-    // Hardcoded login check for now; replace with Firebase Authentication later
-    // TODO: Replace this with Firebase Authentication logic when integrating Firebase
-    if (_emailController.text.trim() == 'admin@zeatapp.com') {
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/admin-dashboard');
+  Future<void> _signInAsAdmin() async {
+    setState(() {
+      _errorMessage = null;
+    });
+
+    try {
+      // Sign in with Firebase Authentication
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+
+      final user = userCredential.user;
+      if (user != null) {
+        // Check if the email and password match the admin credentials
+        if (_emailController.text.trim() == 'admin@zeatapp.com' &&
+            _passwordController.text.trim() == 'admin1') {
+          // Check role in Firestore
+          final userDoc =
+              await FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(user.uid)
+                  .get();
+          if (userDoc.exists) {
+            final role = userDoc.data()?['role'] as String?;
+            if (role == 'admin') {
+              if (mounted) {
+                Navigator.pushReplacementNamed(context, '/admin-dashboard');
+              }
+            } else {
+              await FirebaseAuth.instance.signOut();
+              if (mounted) {
+                setState(() {
+                  _errorMessage = 'Access denied. Admin role required.';
+                });
+              }
+            }
+          } else {
+            await FirebaseAuth.instance.signOut();
+            if (mounted) {
+              setState(() {
+                _errorMessage = 'User profile not found.';
+              });
+            }
+          }
+        } else {
+          await FirebaseAuth.instance.signOut();
+          if (mounted) {
+            setState(() {
+              _errorMessage =
+                  'Invalid admin credentials. Use admin@zeatapp.com and admin1.';
+            });
+          }
+        }
       }
-    } else {
-      setState(() {
-        _errorMessage = 'Invalid email or password.';
-      });
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        setState(() {
+          switch (e.code) {
+            case 'user-not-found':
+              _errorMessage = 'No user found for that email.';
+              break;
+            case 'wrong-password':
+              _errorMessage = 'Incorrect password.';
+              break;
+            default:
+              _errorMessage = 'Login failed: ${e.message}';
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'An unexpected error occurred: $e';
+        });
+      }
     }
   }
 
@@ -39,7 +107,12 @@ class AdminLoginPageState extends State<AdminLoginPage> {
       appBar: AppBar(
         title: const Text('Admin Login'),
         backgroundColor: Colors.black,
-        leading: const Icon(Icons.arrow_back),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Container(
         color: Colors.pink[50],
@@ -48,7 +121,6 @@ class AdminLoginPageState extends State<AdminLoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Email Field
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
@@ -69,7 +141,6 @@ class AdminLoginPageState extends State<AdminLoginPage> {
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
-              // Password Field
               TextField(
                 controller: _passwordController,
                 decoration: InputDecoration(
@@ -90,7 +161,6 @@ class AdminLoginPageState extends State<AdminLoginPage> {
                 obscureText: true,
               ),
               const SizedBox(height: 16),
-              // Error Message
               if (_errorMessage != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
@@ -99,7 +169,6 @@ class AdminLoginPageState extends State<AdminLoginPage> {
                     style: const TextStyle(color: Colors.red),
                   ),
                 ),
-              // Login Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -122,9 +191,7 @@ class AdminLoginPageState extends State<AdminLoginPage> {
                 alignment: Alignment.centerLeft,
                 child: IconButton(
                   icon: const Icon(Icons.menu, color: Colors.black),
-                  onPressed: () {
-                    // Placeholder for menu action
-                  },
+                  onPressed: () {},
                 ),
               ),
             ],

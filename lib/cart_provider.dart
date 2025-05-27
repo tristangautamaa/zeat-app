@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class CartItem {
   final String id;
   final String name;
-  final double price;
+  final num price; // Changed from double to num to match HomePage
   final String image;
   int quantity;
 
@@ -21,14 +21,10 @@ class CartProvider with ChangeNotifier {
 
   List<CartItem> get items => _items;
 
-  double get totalPrice {
-    return _items.fold(
-      0,
-      (total, item) => total + (item.price * item.quantity),
-    );
-  }
+  num get totalPrice =>
+      _items.fold(0, (total, item) => total + (item.price * item.quantity));
 
-  void addItem(String id, String name, double price, String image) {
+  void addItem(String id, String name, num price, String image) {
     final existingItemIndex = _items.indexWhere((item) => item.id == id);
     if (existingItemIndex >= 0) {
       _items[existingItemIndex].quantity += 1;
@@ -50,9 +46,7 @@ class CartProvider with ChangeNotifier {
     final itemIndex = _items.indexWhere((item) => item.id == id);
     if (itemIndex >= 0) {
       _items[itemIndex].quantity -= 1;
-      if (_items[itemIndex].quantity <= 0) {
-        _items.removeAt(itemIndex);
-      }
+      if (_items[itemIndex].quantity <= 0) _items.removeAt(itemIndex);
       notifyListeners();
     }
   }

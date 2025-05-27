@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:intl/intl.dart';
+import 'dart:async';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,13 +13,13 @@ class HomePageState extends State<HomePage> {
   String? _selectedCategory = 'All Pastry';
   final TextEditingController _searchController = TextEditingController();
   final List<Map<String, dynamic>> _menuItems = [
-    // Puff Pastry
     {
       'id': '1',
       'name': 'Croissant',
       'category': 'Puff Pastry',
       'price': 10000,
       'image': 'assets/croissant.jpg',
+      'description': 'A buttery, flaky croissant with a golden crust.',
     },
     {
       'id': '2',
@@ -27,6 +27,7 @@ class HomePageState extends State<HomePage> {
       'category': 'Puff Pastry',
       'price': 12000,
       'image': 'assets/pain-au-chocolat.jpg',
+      'description': 'A puff pastry filled with rich chocolate.',
     },
     {
       'id': '3',
@@ -34,6 +35,7 @@ class HomePageState extends State<HomePage> {
       'category': 'Puff Pastry',
       'price': 15000,
       'image': 'assets/pastry-chicken-puff.jpg',
+      'description': 'A savory puff pastry stuffed with chicken.',
     },
     {
       'id': '4',
@@ -41,14 +43,15 @@ class HomePageState extends State<HomePage> {
       'category': 'Puff Pastry',
       'price': 14000,
       'image': 'assets/apple-turnover.jpg',
+      'description': 'A sweet turnover filled with apple compote.',
     },
-    // Danish Pastry
     {
       'id': '5',
       'name': 'Apple Danish',
       'category': 'Danish Pastry',
       'price': 13000,
       'image': 'assets/apple-danish.jpg',
+      'description': 'A danish pastry with apple filling.',
     },
     {
       'id': '6',
@@ -56,6 +59,7 @@ class HomePageState extends State<HomePage> {
       'category': 'Danish Pastry',
       'price': 13500,
       'image': 'assets/custard-danish.jpg',
+      'description': 'A danish filled with creamy custard.',
     },
     {
       'id': '7',
@@ -63,6 +67,7 @@ class HomePageState extends State<HomePage> {
       'category': 'Danish Pastry',
       'price': 14000,
       'image': 'assets/blueberry-danish.jpg',
+      'description': 'A danish with fresh blueberry topping.',
     },
     {
       'id': '8',
@@ -70,14 +75,15 @@ class HomePageState extends State<HomePage> {
       'category': 'Danish Pastry',
       'price': 14500,
       'image': 'assets/strawberry-danish.jpg',
+      'description': 'A danish with sweet strawberry filling.',
     },
-    // Shortcrust Pastry
     {
       'id': '9',
       'name': 'Fruit Tart',
       'category': 'Shortcrust Pastry',
       'price': 18000,
       'image': 'assets/fruit-tart.jpg',
+      'description': 'A tart with fresh fruits and custard.',
     },
     {
       'id': '10',
@@ -85,6 +91,7 @@ class HomePageState extends State<HomePage> {
       'category': 'Shortcrust Pastry',
       'price': 12000,
       'image': 'assets/egg-tart.jpg',
+      'description': 'A classic egg custard tart.',
     },
     {
       'id': '11',
@@ -92,6 +99,7 @@ class HomePageState extends State<HomePage> {
       'category': 'Shortcrust Pastry',
       'price': 16000,
       'image': 'assets/apple-tart.jpg',
+      'description': 'A tart with caramelized apples.',
     },
     {
       'id': '12',
@@ -99,14 +107,15 @@ class HomePageState extends State<HomePage> {
       'category': 'Shortcrust Pastry',
       'price': 17000,
       'image': 'assets/chocolate-tart.jpg',
+      'description': 'A rich chocolate-filled tart.',
     },
-    // Choux Pastry
     {
       'id': '13',
       'name': 'Vandbakkelseskrans',
       'category': 'Choux Pastry',
       'price': 20000,
       'image': 'assets/vandbakkelseskrans.webp',
+      'description': 'A choux pastry ring with cream.',
     },
     {
       'id': '14',
@@ -114,6 +123,7 @@ class HomePageState extends State<HomePage> {
       'category': 'Choux Pastry',
       'price': 13000,
       'image': 'assets/chocolate-choux.jpg',
+      'description': 'A choux pastry with chocolate cream.',
     },
     {
       'id': '15',
@@ -121,6 +131,7 @@ class HomePageState extends State<HomePage> {
       'category': 'Choux Pastry',
       'price': 15000,
       'image': 'assets/eclair.jpg',
+      'description': 'A classic eclair with vanilla cream.',
     },
     {
       'id': '16',
@@ -128,6 +139,7 @@ class HomePageState extends State<HomePage> {
       'category': 'Choux Pastry',
       'price': 14000,
       'image': 'assets/vanilla-cream-choux.jpg',
+      'description': 'A choux pastry with vanilla cream.',
     },
   ];
 
@@ -137,8 +149,8 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _filteredItems = _menuItems;
-    _filterItems();
+    _filteredItems = List.from(_menuItems);
+    _searchController.addListener(_onSearchChanged);
   }
 
   @override
@@ -155,7 +167,7 @@ class HomePageState extends State<HomePage> {
     });
   }
 
-  void _onSearchChanged(String value) {
+  void _onSearchChanged() {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       setState(() {
@@ -167,10 +179,10 @@ class HomePageState extends State<HomePage> {
   void _filterItems() {
     _filteredItems =
         _menuItems.where((item) {
-          bool matchesCategory =
+          final matchesCategory =
               _selectedCategory == 'All Pastry' ||
               item['category'] == _selectedCategory;
-          bool matchesSearch =
+          final matchesSearch =
               item['name'].toString().toLowerCase().contains(
                 _searchController.text.toLowerCase(),
               ) ||
@@ -192,33 +204,34 @@ class HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Location',
                   style: TextStyle(color: Colors.grey, fontSize: 14),
                 ),
-                Text(
+                const Text(
                   'Bandar Lampung',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search, color: Colors.grey),
+                    // <-- removed 'const' here
+                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
                     hintText: 'Search pastry...',
-                    hintStyle: TextStyle(color: Colors.grey),
+                    hintStyle: const TextStyle(color: Colors.grey),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onChanged: _onSearchChanged,
+                  onChanged: (value) => _onSearchChanged(),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Center(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -226,12 +239,20 @@ class HomePageState extends State<HomePage> {
                 'assets/home-discount.png',
                 height: 150,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 150,
+                    width: double.infinity,
+                    color: Colors.grey,
+                    child: const Icon(Icons.error, color: Colors.red),
+                  );
+                },
               ),
             ),
           ),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
             child: Row(
               children: [
                 CategoryChip(
@@ -264,8 +285,8 @@ class HomePageState extends State<HomePage> {
           ),
           Expanded(
             child: GridView.builder(
-              padding: EdgeInsets.all(10),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              padding: const EdgeInsets.all(10),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 0.75,
                 crossAxisSpacing: 10,
@@ -273,13 +294,14 @@ class HomePageState extends State<HomePage> {
               ),
               itemCount: _filteredItems.length,
               itemBuilder: (context, index) {
-                var item = _filteredItems[index];
+                final item = _filteredItems[index];
                 return MenuItemCard(
-                  id: item['id'],
-                  name: item['name'],
-                  category: item['category'],
-                  price: item['price'],
-                  image: item['image'],
+                  id: item['id'] as String,
+                  name: item['name'] as String,
+                  category: item['category'] as String,
+                  price: item['price'] as num,
+                  image: item['image'] as String,
+                  description: item['description'] as String,
                 );
               },
             ),
@@ -292,13 +314,12 @@ class HomePageState extends State<HomePage> {
         unselectedItemColor: Colors.white70,
         currentIndex: 0,
         onTap: (index) {
-          if (index == 0) {
+          if (index == 0)
             return;
-          } else if (index == 1) {
+          else if (index == 1)
             Navigator.pushNamed(context, '/chatbot');
-          } else if (index == 2) {
+          else if (index == 2)
             Navigator.pushNamed(context, '/profile');
-          }
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
@@ -310,7 +331,7 @@ class HomePageState extends State<HomePage> {
   }
 }
 
-class CategoryChip extends StatelessWidget {
+class CategoryChip extends StatefulWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onSelected;
@@ -323,15 +344,18 @@ class CategoryChip extends StatelessWidget {
   });
 
   @override
+  CategoryChipState createState() => CategoryChipState();
+}
+
+class CategoryChipState extends State<CategoryChip> {
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: ChoiceChip(
-        label: Text(label, style: TextStyle(color: Colors.white)),
-        selected: isSelected,
-        onSelected: (bool selected) {
-          onSelected();
-        },
+        label: Text(widget.label, style: const TextStyle(color: Colors.white)),
+        selected: widget.isSelected,
+        onSelected: (bool selected) => widget.onSelected(),
         selectedColor: Colors.brown[300],
         backgroundColor: Colors.brown[600],
       ),
@@ -339,12 +363,13 @@ class CategoryChip extends StatelessWidget {
   }
 }
 
-class MenuItemCard extends StatelessWidget {
+class MenuItemCard extends StatefulWidget {
   final String id;
   final String name;
   final String category;
   final num price;
   final String image;
+  final String description;
 
   const MenuItemCard({
     super.key,
@@ -353,19 +378,36 @@ class MenuItemCard extends StatelessWidget {
     required this.category,
     required this.price,
     required this.image,
+    required this.description,
   });
 
   @override
+  MenuItemCardState createState() => MenuItemCardState();
+}
+
+class MenuItemCardState extends State<MenuItemCard> {
+  @override
   Widget build(BuildContext context) {
-    double nameFontSize = name.length > 12 ? 14.0 : 18.0;
+    final nameFontSize = widget.name.length > 12 ? 14.0 : 18.0;
 
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/menu-item-detail', arguments: id);
+        Navigator.pushNamed(
+          context,
+          '/menu-item-detail',
+          arguments: {
+            'id': widget.id,
+            'name': widget.name,
+            'category': widget.category,
+            'price': widget.price,
+            'image': widget.image,
+            'description': widget.description,
+          },
+        );
       },
       child: Container(
-        margin: EdgeInsets.all(5),
-        padding: EdgeInsets.all(10),
+        margin: const EdgeInsets.all(5),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
@@ -375,17 +417,21 @@ class MenuItemCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              image,
+              widget.image,
               width: 100,
               height: 100,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(Icons.error, size: 50, color: Colors.red);
-              },
+              errorBuilder:
+                  (context, error, stackTrace) => Container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.grey,
+                    child: const Icon(Icons.error, size: 50, color: Colors.red),
+                  ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
-              name,
+              widget.name,
               style: TextStyle(
                 fontSize: nameFontSize,
                 color: Colors.black,
@@ -396,8 +442,8 @@ class MenuItemCard extends StatelessWidget {
               maxLines: 1,
             ),
             Text(
-              category,
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              widget.category,
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -406,18 +452,34 @@ class MenuItemCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Rp ${NumberFormat('#,###', 'id_ID').format(price)}',
-                  style: TextStyle(fontSize: 16, color: Colors.black),
+                  'Rp ${NumberFormat('#,###', 'id_ID').format(widget.price)}',
+                  style: const TextStyle(fontSize: 16, color: Colors.black),
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/menu-item-detail',
+                      arguments: {
+                        'id': widget.id,
+                        'name': widget.name,
+                        'category': widget.category,
+                        'price': widget.price,
+                        'image': widget.image,
+                        'description': widget.description,
+                      },
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.brown[300],
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    minimumSize: Size(30, 30),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    minimumSize: const Size(30, 30),
                   ),
-                  child: Text(
+                  child: const Text(
                     '+',
                     style: TextStyle(color: Colors.white, fontSize: 16),
                   ),

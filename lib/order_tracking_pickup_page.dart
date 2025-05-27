@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'home_page.dart';
 import 'thank_you_page.dart';
+import 'cart_provider.dart';
 
 class OrderTrackingPickupPage extends StatefulWidget {
   const OrderTrackingPickupPage({
@@ -16,7 +17,7 @@ class OrderTrackingPickupPage extends StatefulWidget {
   final String storeLocation;
   final String pickUpTime;
   final double total;
-  final List<dynamic> items;
+  final List<CartItem> items; // Updated to use CartItem type
   final String paymentMethod;
 
   @override
@@ -59,7 +60,6 @@ class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Map taking up the full screen
           GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: const CameraPosition(
@@ -69,24 +69,20 @@ class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
             mapType: MapType.normal,
             markers: _markers,
           ),
-          // Home button at top left
           Positioned(
             top: 40,
             left: 16,
             child: IconButton(
               icon: const Icon(Icons.home, size: 30, color: Colors.black),
               onPressed: () {
-                if (mounted) {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
-                    (route) => false,
-                  );
-                }
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  (route) => false,
+                );
               },
             ),
           ),
-          // Semi-transparent overlay for content
           Positioned(
             bottom: 0,
             left: 0,
@@ -97,7 +93,6 @@ class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Pick up time
                   Center(
                     child: Text(
                       widget.pickUpTime,
@@ -116,7 +111,6 @@ class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // 2. Store Address title and location
                   const Center(
                     child: Text(
                       'Store Address',
@@ -135,22 +129,19 @@ class _OrderTrackingPickupPageState extends State<OrderTrackingPickupPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // 3. Order picked up button at the bottom
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        if (mounted) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => const ThankYouPage(
-                                    title: 'Order Picked Up',
-                                  ),
-                            ),
-                          );
-                        }
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder:
+                                (context) => const ThankYouPage(
+                                  title: 'Order Picked Up',
+                                ),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange[700],
